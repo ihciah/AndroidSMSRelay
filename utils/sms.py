@@ -7,6 +7,7 @@ __author__ = 'ihciah'
 
 
 def sms_escape(sms):
+    # Unfinished(Maybe dangerous when others can send sms).
     sms = sms.replace("\"", "\\\"").replace("\\", "\\\\")
     sms = sms.replace("`", "\\`")
     return sms
@@ -15,6 +16,7 @@ def sms_escape(sms):
 def send_sms(number, content, card):
     receiver = str(number).replace("+", "").replace(".", "")
     if not receiver.startswith("86"):
+        # Default for China phone number
         receiver = "86" + receiver
     if not receiver.isdigit():
         TGBot.send_message("Number %s is invalid." % number, card)

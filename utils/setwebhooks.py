@@ -6,8 +6,8 @@ from config import PROXY, TG_TOKEN
 
 __author__ = 'ihciah'
 
-DOMAIN = "https://ihc.im/"
+CALLBACK = "https://ihc.im/" + TG_TOKEN  # Modify this url to your callback url.
 
 url = "https://api.telegram.org/bot%s/setWebhook" % TG_TOKEN
-res = requests.post(url, {"url": "%s%s" % (DOMAIN, TG_TOKEN)}, proxies=PROXY)
+res = requests.post(url, {"url": CALLBACK}, proxies=PROXY)
 print res.content

@@ -9,7 +9,7 @@ person_patten = re.compile(r'BEGIN:VCARD(.*?)END:VCARD', re.DOTALL)
 fullname_patten = re.compile(r'FN:(.*?)\n')
 mobile_patten = re.compile(r':\+*?(\d{9}\d*?)\n')
 
-f = open(r'data/iCloud vCard-wyh.vcf')
+f = open(r'data/iCloud vCard.vcf')
 fc = f.read()
 people = person_patten.findall(fc)
 f.close()
