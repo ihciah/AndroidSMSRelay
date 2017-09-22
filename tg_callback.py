@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, request
-import requests
-import subprocess
-from contact_book import Contact
-from config import TG_TOKEN, KB_IMAGE, CHAT_ID, PROXY, CONTACT
+
 from config import KB_COMMAND, KB_IMAGE_CAPTION, FIND_CONTACT_COMMAND, SMS_COMMAND
+from config import TG_TOKEN, KB_IMAGE, CHAT_ID, CONTACT
+from utils.TG_Bot import TGBot
+from utils.contact_book import Contact
+from utils.misc import FileLock
+from utils.sms import send_sms
 
 __author__ = 'ihciah'
 
@@ -14,63 +16,57 @@ contact = Contact(CONTACT)
 app = Flask(__name__)
 
 
-def send_message(text):
-    TG_MESSAGE_URL = "https://api.telegram.org/bot%s/sendMessage" % TG_TOKEN
-    data = {"chat_id": CHAT_ID,
-            "text": text,
-            "disable_notification": False
-            }
-    requests.post(TG_MESSAGE_URL, data, proxies=PROXY)
-
-
-def send_image(image_url, caption=""):
-    TG_PHOTO_URL = "https://api.telegram.org/bot%s/sendPhoto" % TG_TOKEN
-    data = {"chat_id": CHAT_ID,
-            "photo": image_url,
-            "disable_notification": False,
-            }
-    if caption:
-        data["caption"] = caption
-    requests.post(TG_PHOTO_URL, data, proxies=PROXY)
-
-
-def send_sms(message):
+def parse_authorized_message(message):
     if 'text' not in message:
         return
-    text = message['text']
-    text = text.split(" ", 2)
+    original_text = message['text'].strip()
+    card = CHAT_ID.index(message['chat']['id'])
+
+    # Send sms
+    text = original_text.split(" ", 2)
     if len(text) >= 3 and text[0] in SMS_COMMAND:
-        receiver = text[1].replace("+", "").replace(".", "")
-        if not receiver.startswith("86"):
-            receiver = "86" + receiver
-        if not receiver.isdigit():
-            send_message("Number %s is invalid." % text[1])
-            return
-        sms = text[2]
-        sms = sms.replace("\"", "\\\"")
-        subprocess.call(['adb', 'shell', 'service', 'call', 'isms', '5', 's16',
-                         receiver, 'i32', '0', 'i32', '0', 's16', sms
-                         ])
-        send_message("SMS to %s has been sent:\n%s" % (receiver, text[2]))
-        return
+        send_sms(text[1], text[2], card)
+        return True
+
+    # Lookup contact
+    text = original_text.split(" ", 1)
     if len(text) == 2 and text[0] in FIND_CONTACT_COMMAND:
-        result = contact.search_name(text[1].strip())
-        if result:
-            result_message = ("Results for %s:\n" % text[1]) + "\n".join(["%s  %s" % (who, num) for who, num in result])
-            send_message(result_message)
-        else:
-            send_message("No result for %s" % text[1])
+        contact.send_contact(text[1], card)
+        return True
+
+    # KB command
+    text = original_text
+    if text in KB_COMMAND:
+        TGBot.send_image(KB_IMAGE, KB_IMAGE_CAPTION)
+        return True
+
+    return False
+
+
+def parse_normal_message(message):
+    if 'text' not in message:
         return
-    if len(text) == 1 and text[0] in KB_COMMAND:
-        send_image(KB_IMAGE, KB_IMAGE_CAPTION)
-        return
-    send_message("Command not found:\n%s" % message['text'])
+    chat_id = message['chat']['id']
+
+    # Reply chat ID
+    if message['text'] == "id":
+        TGBot.send_message(str(chat_id), chat_id)
+    else:
+        TGBot.send_message("Command not found:\n%s" % message['text'], chat_id)
 
 
 def handle_message(msg):
     message = msg['message']
-    if message['chat']['id'] == CHAT_ID:
-        send_sms(message)
+    flag = False
+    if message['chat']['id'] in CHAT_ID:
+        FileLock.wait_lock()
+        try:
+            FileLock.create_lock()
+            flag = parse_authorized_message(message)
+        finally:
+            FileLock.delete_lock()
+    if not flag:
+        parse_normal_message(message)
 
 
 @app.route('/'+TG_TOKEN, methods=['POST'])

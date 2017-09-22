@@ -11,12 +11,18 @@ Useful when you have another phone number but unwilling to carry 2 phones out.
 - Some useful features: 
 	- Query phone number.
 	- Query curriculum.
+- Dual sim card to different users.
 
 ### Prerequisite
 
-- An android device with root and debug mode open(I use an android 4.0.4).
-- A linux server with network and adb tools installed(I use shadowsocks to provide a socks5 proxy for connecting to telegram server because of the GFW).
-- Python 2.7, requests, requests[socks], flask
+- An android device with root and debug mode open.
+    - I use an android 4.0.4 because of poor, on other versions you should check the debug and lock screen settings.
+- A linux server(Rpi for example) with adb tools installed.
+- Proper network connection
+    - I use shadowsocks to provide a socks5 proxy for connecting to telegram server due to the GFW.
+    - Also a tinc VPN is used to forward requests to inner server:
+    - Flask ===SOCK FILE=== nginx(Rpi, Fudan Uni.) ===TINC=== VPS nginx(AWS, Seoul)
+- Python 2.7, requests, requests[socks], flask, uwsgi, nginx
 
 
 ### How it works

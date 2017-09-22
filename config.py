@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 TG_TOKEN = "YOUR_TELEGRAM_TOKEN"
-CHAT_ID = 259444514  # Your chat id to yourself
+CHAT_ID = [259444514, 259444514]  # Your chat id to yourself (2 for dual sim card)
 
 KB_COMMAND = ["kb", u"课表"]
 KB_IMAGE = "https://unknown"
