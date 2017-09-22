@@ -6,10 +6,10 @@ Useful when you have another phone number but unwilling to carry 2 phones out.
 ### Features
 
 - Forward sms to telegram chat.
-- Match contacts automaticly.
+- Match contacts automatically.
 - Send sms using telegram.
 - Some useful features: 
-	- Query phone number.
+	- Query phone number(You can import contacts from iCloud).
 	- Query curriculum.
 - Dual sim card to different users.
 - Reply telegram message to reply sms quickly.
@@ -24,7 +24,7 @@ Useful when you have another phone number but unwilling to carry 2 phones out.
     - I use shadowsocks to provide a socks5 proxy for connecting to telegram server due to the GFW.
     - Also a tinc VPN is used to forward requests to inner server:
     - Flask ===SOCK FILE=== nginx(Rpi, Fudan Uni.) ===TINC=== VPS nginx(AWS, Seoul)
-- Python 2.7, requests, requests[socks], flask, uwsgi, nginx
+- Python 2.7, requests, requests[socks], flask, uwsgi, nginx, supervisor
 
 
 ### How it works
@@ -34,13 +34,21 @@ Useful when you have another phone number but unwilling to carry 2 phones out.
 - Simulate key press when entering PIN code after reboot.
 
 ![look1](data/Sketch.png)
+(Send and receive sms, contacts matching automatically)
 
+<br>
 
 ![look2](data/Sketch2.png)
+(Query contacts)
+
+<br>
 
 
 ![look3](data/Sketch3.png)
-(Message for sending status)
+(Quick reply && Message for sending status)
+
+<br>
 
 
 ![look3](data/Sketch4.png)
+(Message update to sent status)
