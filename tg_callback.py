@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, request
-
 from config import KB_COMMAND, KB_IMAGE_CAPTION, FIND_CONTACT_COMMAND, SMS_COMMAND
 from config import TG_TOKEN, KB_IMAGE, CHAT_ID, CONTACT
 from utils.TG_Bot import TGBot
 from utils.contact_book import Contact
 from utils.misc import FileLock
-from utils.sms import send_sms
+from utils.sms import send_sms, reply_sms
 
 __author__ = 'ihciah'
 
@@ -26,6 +25,11 @@ def parse_authorized_message(message):
     text = original_text.split(" ", 2)
     if len(text) >= 3 and text[0] in SMS_COMMAND:
         send_sms(text[1], text[2], card)
+        return True
+
+    # Reply sms
+    if 'reply_to_message' in message and len(original_text):
+        reply_sms(message['reply_to_message'], original_text, card)
         return True
 
     # Lookup contact
@@ -80,4 +84,3 @@ def recv():
 
 if __name__ == '__main__':
     app.run(host="192.168.102.130", port=11100)
-

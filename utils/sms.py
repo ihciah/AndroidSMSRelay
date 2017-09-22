@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import subprocess
+import re
 
 from utils.TG_Bot import TGBot
 
@@ -7,7 +8,6 @@ __author__ = 'ihciah'
 
 
 def sms_escape(sms):
-    # Unfinished(Maybe dangerous when others can send sms).
     sms = sms.replace("\"", "\\\"").replace("\\", "\\\\")
     sms = sms.replace("`", "\\`")
     return sms
@@ -16,7 +16,6 @@ def sms_escape(sms):
 def send_sms(number, content, card):
     receiver = str(number).replace("+", "").replace(".", "")
     if not receiver.startswith("86"):
-        # Default for China phone number
         receiver = "86" + receiver
     if not receiver.isdigit():
         TGBot.send_message("Number %s is invalid." % number, card)
@@ -47,3 +46,15 @@ def send_sms(number, content, card):
         TGBot.update_message("SMS to %s has been sent:\n%s" % (receiver, content), message_id, card)
     else:
         TGBot.send_message("SMS to %s has been sent:\n%s" % (receiver, content), card)
+
+
+def reply_sms(message_to_reply, sms_content, card):
+    if 'text' in message_to_reply:
+        reply_text = message_to_reply['text']
+        last_line = reply_text.split("\n")[-1]
+        pattern = re.compile(r'(\d{3,})')
+        m = re.search(pattern, last_line)
+        if m:
+            send_sms(m.group(0), sms_content, card)
+            return
+    TGBot.send_message("Cannot reply message!", card)

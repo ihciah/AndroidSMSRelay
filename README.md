@@ -12,6 +12,8 @@ Useful when you have another phone number but unwilling to carry 2 phones out.
 	- Query phone number.
 	- Query curriculum.
 - Dual sim card to different users.
+- Reply telegram message to reply sms quickly.
+
 
 ### Prerequisite
 
@@ -35,3 +37,10 @@ Useful when you have another phone number but unwilling to carry 2 phones out.
 
 
 ![look2](data/Sketch2.png)
+
+
+![look3](data/Sketch3.png)
+(Message for sending status)
+
+
+![look3](data/Sketch4.png)
