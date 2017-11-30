@@ -23,13 +23,21 @@ def send_telegram(address, date, date_sent, body, user=0):
     ret, sender_name = contact_book.num2name(address)
     if not ret:
         sender_name = "No matching contact"
-    TGBot.send_message(message % (body, date, date_sent, address, sender_name), user)
+    result = None
+    try:
+        result = TGBot.send_message(message % (body, date, date_sent, address, sender_name), user)
+    except:
+        pass
+    return result
 
 
 def read_db():
     db_path = get_db_save_path()
     DOWNLOAD_COMMAND = "/usr/bin/adb pull /data/data/com.android.providers.telephony/databases/mmssms.db %s"
     os.system(DOWNLOAD_COMMAND % db_path)
+    if not os.path.isfile(db_path) or os.path.getsize(db_path) == 0:
+        clean_env()
+        return
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     SQL = 'SELECT _id,address,date,date_sent,body,sub_id FROM sms WHERE date>%d AND type=1 ORDER BY date ASC'
@@ -37,8 +45,8 @@ def read_db():
     values = cursor.fetchall()
     print values
     for _id, address, date, date_sent, body, sub_id in values:
-        send_telegram(address, date, date_sent, body, sub_id)
-        last_time.update_time(date)
+        if send_telegram(address, date, date_sent, body, sub_id) is not None:
+            last_time.update_time(date)
     conn.close()
     clean_env()
 
@@ -46,6 +54,6 @@ if __name__ == "__main__":
     while True:
         try:
             read_db()
-        finally:
+        except:
             pass
         time.sleep(CHECK_INTERVAL)

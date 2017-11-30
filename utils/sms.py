@@ -15,7 +15,7 @@ def sms_escape(sms):
 
 def send_sms(number, content, card):
     receiver = str(number).replace("+", "").replace(".", "")
-    if not receiver.startswith("86"):
+    if receiver[:2] in ["13", "18", "17", "15", "14"] and len(receiver) == 11:
         receiver = "86" + receiver
     if not receiver.isdigit():
         TGBot.send_message("Number %s is invalid." % number, card)

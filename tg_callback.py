@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, request
-from config import KB_COMMAND, KB_IMAGE_CAPTION, FIND_CONTACT_COMMAND, SMS_COMMAND
+from config import KB_COMMAND, KB_IMAGE_CAPTION, FIND_CONTACT_COMMAND, SMS_COMMAND, AWS_COMMAND
 from config import TG_TOKEN, KB_IMAGE, CHAT_ID, CONTACT
 from utils.TG_Bot import TGBot
 from utils.contact_book import Contact
 from utils.misc import FileLock
 from utils.sms import send_sms, reply_sms
+from utils.aws import get_used_bandwidth
 
 __author__ = 'ihciah'
 
@@ -42,6 +43,14 @@ def parse_authorized_message(message):
     text = original_text
     if text in KB_COMMAND:
         TGBot.send_image(KB_IMAGE, KB_IMAGE_CAPTION)
+        return True
+
+    # AWS bandwidth command
+    text = original_text
+    if text in AWS_COMMAND:
+        message_id = TGBot.send_message("[Working] Query AWS bandwidth...", card)
+        used = get_used_bandwidth() / (1000 ** 3)
+        TGBot.update_message("AWS bandwidth used: %.2f GB / 15 GB" % used, message_id, card)
         return True
 
     return False

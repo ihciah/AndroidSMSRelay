@@ -10,6 +10,8 @@ KB_IMAGE_CAPTION = "小海的课表"
 
 FIND_CONTACT_COMMAND = ["search", "contact", "num"]  # Commands to query contact book
 
+AWS_COMMAND = ["aws", u"流量"]
+
 SMS_COMMAND = ["sms"]  # Commands to send sms
 
 # Proxy to connect to telegram
@@ -21,6 +23,8 @@ CONTACT = "/opt/sms/data/dump"  # Path to contact json file
 MEM_SAVE_PATH = "/dev/shm/mmssms.db"  # DB saving path when /dev/shm is available
 SAVE_PATH = "/tmp/mmssms.db"  # DB saving path when /dev/shm is not available
 LAST_FILE = "/opt/sms/data/last"  # File to save the time of last checking
+LOCK = "/dev/shm/sms-lock"
+MAX_LOCK_WAIT = 20
 
 FREE_SIZE = 50
 CHECK_INTERVAL = 10
